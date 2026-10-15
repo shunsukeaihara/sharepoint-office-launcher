@@ -1,0 +1,16 @@
+{
+  "name": "sharepoint-office-launcher",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "package": "sh scripts/package.sh",
+    "test:e2e": "node test/e2e/run.mjs"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shunsukeaihara/sharepoint-office-launcher.git"
+  }
+}

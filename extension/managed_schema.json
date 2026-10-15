@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "title": "拡張機能を有効にする",
+      "type": "boolean"
+    },
+    "allowedHosts": {
+      "title": "許可する SharePoint ホスト",
+      "description": "例: [\"contoso.sharepoint.com\", \"contoso-my.sharepoint.com\"]。テナント名のみ（contoso）も可。",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "openMode": {
+      "title": "開き方（ofe=編集, ofv=閲覧）",
+      "type": "string",
+      "enum": ["ofe", "ofv"]
+    },
+    "autoLaunch": {
+      "title": "自動起動する",
+      "type": "boolean"
+    },
+    "closeTabAfterLaunch": {
+      "title": "起動後にタブを閉じる",
+      "type": "boolean"
+    }
+  }
+}
