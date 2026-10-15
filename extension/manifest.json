@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "SharePoint Office Launcher",
   "short_name": "SP Office Launcher",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "許可した SharePoint テナントの PowerPoint / Excel / Word リンクを Office デスクトップアプリで直接開きます。",
   "minimum_chrome_version": "110",
   "permissions": ["webNavigation", "webRequest", "storage"],

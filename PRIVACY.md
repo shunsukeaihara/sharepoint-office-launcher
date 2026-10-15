@@ -4,7 +4,15 @@ SharePoint Office Launcher（以下「本拡張機能」）の個人情報の取
 
 ## 収集する情報
 
-本拡張機能は、個人情報・閲覧履歴・ファイルの内容・認証情報を含め、**いかなるデータも収集・送信しません**。開発者や第三者のサーバーとの通信は一切行いません。
+本拡張機能は、個人情報・閲覧履歴・ファイルの内容・認証情報を含め、**いかなるデータも収集しません**。開発者や第三者のサーバーとの通信は一切行いません。
+
+## SharePoint への問い合わせ
+
+`/:p:/r/…/_layouts/15/Doc.aspx?sourcedoc=…` 形式のリンクは、URL にファイルのフォルダパスが含まれません。そのため、このリンクを開いたときに限り、**リンクと同じ（ユーザーが許可した）SharePoint テナント**の API（`/_api/web/GetFileById('<ファイルID>')?$select=ServerRelativeUrl`）に、ブラウザのサインイン状態を使って問い合わせ、ファイルの場所（サーバー上のパス）だけを取得します。
+
+- 問い合わせは読み取り（GET）のみで、SharePoint 上のデータを変更しません。
+- 取得したファイルの場所は、Office アプリを起動するためだけに使います。保存や、SharePoint 以外への送信はしません。
+- 認証情報（Cookie など）を読み取ったり保存したりすることはありません（ブラウザが通常どおり送信します）。
 
 ## ブラウザ内に保存する情報
 
@@ -19,7 +27,7 @@ SharePoint Office Launcher（以下「本拡張機能」）の個人情報の取
 
 ## 権限の利用目的
 
-- `webNavigation` / `webRequest` / `https://*.sharepoint.com/*`：ユーザーが登録した SharePoint テナントの Office ファイルリンクへのナビゲーションを検出するためだけに使用します。観測のみで、通信の内容やページの内容・Cookie は読み取りません。
+- `webNavigation` / `webRequest` / `https://*.sharepoint.com/*`：ユーザーが登録した SharePoint テナントの Office ファイルリンクへのナビゲーションを検出するために使用します。観測のみで、通信の内容やページの内容・Cookie は読み取りません。ホスト権限は、上記の SharePoint への問い合わせにも使用します。
 - `storage`：上記の設定と一時情報を保存するために使用します。
 
 ## 第三者への提供
@@ -38,4 +46,4 @@ https://github.com/shunsukeaihara/sharepoint-office-launcher/issues
 
 ## English summary
 
-SharePoint Office Launcher does **not collect, transmit, or sell any data**. It makes no network requests to the developer or any third party. Settings you enter (allowed SharePoint tenant host names, open mode, etc.) are stored only in the browser's extension storage (`chrome.storage.sync`), and a short-lived bypass entry (tab ID and URL, kept up to 60 seconds) is stored in `chrome.storage.session`. The `webNavigation`, `webRequest`, and `https://*.sharepoint.com/*` permissions are used solely to detect navigations to Office file links on the SharePoint tenants you register; request bodies, page contents, and cookies are never read.
+SharePoint Office Launcher does **not collect or sell any data**, and makes no network requests to the developer or any third party. For `/:p:/r/…/_layouts/15/Doc.aspx?sourcedoc=…` links only, it asks the same user-allowed SharePoint tenant (`/_api/web/GetFileById(...)?$select=ServerRelativeUrl`, read-only GET, using the browser's existing sign-in) for the file's server path, which is used solely to launch the Office app and is neither stored nor sent anywhere else. Settings you enter (allowed SharePoint tenant host names, open mode, etc.) are stored only in the browser's extension storage (`chrome.storage.sync`), and a short-lived bypass entry (tab ID and URL, kept up to 60 seconds) is stored in `chrome.storage.session`. The `webNavigation`, `webRequest`, and `https://*.sharepoint.com/*` permissions are used solely to detect navigations to Office file links on the SharePoint tenants you register; request bodies, page contents, and cookies are never read.

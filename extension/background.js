@@ -1,4 +1,4 @@
-import { parseSharePointLink } from './lib/convert.js';
+import { parseDocAspxLink, parseSharePointLink } from './lib/convert.js';
 import { getConfig } from './lib/config.js';
 import { RecentGuard, navKey, takeBypass } from './lib/guard.js';
 
@@ -35,8 +35,10 @@ async function handle(tabId, frameId, url) {
     const config = await getConfig();
     if (!config.enabled) return;
 
-    const result = parseSharePointLink(url, config.allowedHosts, config.openMode);
-    if (!result.ok) return;
+    // /:x:/r/<ファイルパス> 形式、または /:x:/r/…/_layouts/15/Doc.aspx?sourcedoc=… 形式のみ対象。
+    // 後者のファイル場所の解決は launch.html で行う。
+    const direct = parseSharePointLink(url, config.allowedHosts, config.openMode);
+    if (!direct.ok && !parseDocAspxLink(url, config.allowedHosts).ok) return;
 
     const launchUrl = `${chrome.runtime.getURL('launch.html')}?src=${encodeURIComponent(url)}`;
     await chrome.tabs.update(tabId, { url: launchUrl });

@@ -1,7 +1,7 @@
 # SharePoint Office Launcher（Chrome / Edge 拡張機能）
 
 Slack などから既定ブラウザ（Chrome / Edge）に渡された SharePoint の
-`/:p:/r/...pptx`・`/:x:/r/...xlsx`・`/:w:/r/...docx` リンクを検出し、
+`/:p:/r/...pptx`・`/:x:/r/...xlsx`・`/:w:/r/...docx` リンク（`/:p:/r/…/_layouts/15/Doc.aspx?sourcedoc=…` 形式を含む）を検出し、
 実ファイル URL に変換して **Office URI スキーム**（`ms-powerpoint:` / `ms-excel:` / `ms-word:`）で
 デスクトップ版 Office を直接起動する Manifest V3 拡張機能です。
 
@@ -50,6 +50,10 @@ Slack でリンクをクリック
 location.href = Office URI  →  ブラウザの外部プロトコル処理 →  PowerPoint が起動
 ```
 
+`/:p:/r/…/_layouts/15/Doc.aspx?sourcedoc={ファイルID}&file=…` 形式のリンクは、URL にファイルのフォルダパスが含まれていません。
+そのため launch.html が、同じテナント・同じサイトの SharePoint REST API
+`/_api/web/GetFileById('<ファイルID>')?$select=ServerRelativeUrl` に、ブラウザのサインイン状態（Cookie）で問い合わせて実ファイルの場所を取得してから起動します（[1.1](#11-docaspx-形式のリンク)）。
+
 ### 変換規則
 
 | 入力リンク | Office URI |
@@ -63,6 +67,22 @@ location.href = Office URI  →  ブラウザの外部プロトコル処理 → 
 - `ofe` = 編集モード、`ofv` = 読み取り専用。設定で切り替え可能です。
 - 対応拡張子: PowerPoint `pptx pptm ppt ppsx potx` / Excel `xlsx xlsm xlsb xls` / Word `docx docm doc dotx`
 
+### 1.1 Doc.aspx 形式のリンク
+
+例:
+
+```
+https://contoso.sharepoint.com/:p:/r/sites/pj-sample/_layouts/15/Doc.aspx?sourcedoc=%7BAA3B8D18-237C-446C-9D6E-F98E2E9A8FBA%7D&file=%E8%B3%87%E6%96%99.pptx&action=edit
+```
+
+1. `/:p:/r` の後ろからサイトのパス（`/sites/pj-sample`）を、`sourcedoc` からファイル ID（GUID）を取り出します。`file` パラメータがあれば、拡張子が種別と一致することも確認します。
+2. launch.html が `https://contoso.sharepoint.com/sites/pj-sample/_api/web/GetFileById('aa3b8d18-…')?$select=ServerRelativeUrl` に GET で問い合わせます（Cookie 付き、リダイレクトは追わない、タイムアウト 10 秒）。
+3. 返ってきた `ServerRelativeUrl`（例 `/sites/pj-sample/Shared Documents/資料.pptx`）が、リンクのサイト配下にあることを確認します。そのうえで `/:p:/r/` 形式と同じ検証（許可テナント・拡張子・禁止文字・ドットセグメント）を通してから Office URI を組み立てます。
+4. 問い合わせに失敗した場合（未サインイン・アクセス権なし・ファイルなし・タイムアウトなど）は、理由と「ブラウザで開く」ボタンを表示します。
+
+- 問い合わせ先は、リンクと同じ許可済みテナントの SharePoint だけです。取得した情報はどこにも送信・保存しません。
+- `/:p:/r/` が付かない `…/_layouts/15/Doc.aspx` のリンク（SharePoint の画面内でファイルをクリックしたときなど）には介入しません。
+
 ### 対象外（ブラウザでそのまま開く）
 
 - `/:p:/g/…`、`/:p:/s/…` などの **共有リンク（パスを含まない形式）**。実ファイル URL をクライアント側で復元できないため。
@@ -74,7 +94,7 @@ location.href = Office URI  →  ブラウザの外部プロトコル処理 → 
 ## 2. 同梱物
 
 ```
-sharepoint-office-launcher-1.1.0/
+sharepoint-office-launcher-1.2.0/
 ├── README.md               … 本書
 ├── package.json            … テスト / パッケージ用スクリプト定義
 ├── extension/              … ★ブラウザに読み込むフォルダ（manifest.json があるフォルダ）
@@ -86,6 +106,7 @@ sharepoint-office-launcher-1.1.0/
 │   ├── lib/convert.js      … URL 変換・検証（純粋関数）
 │   ├── lib/guard.js        … 二重処理・ループ防止（純粋関数）
 │   ├── lib/config.js       … 設定の解決（ポリシー > ユーザー設定 > 既定値）
+│   ├── lib/resolve.js      … Doc.aspx 形式のファイル ID から実ファイルの場所を取得
 │   ├── ui.css
 │   └── icons/
 ├── test/                   … node:test による単体テスト、test/e2e/ に Playwright E2E
@@ -97,7 +118,7 @@ sharepoint-office-launcher-1.1.0/
     └── render-store-assets.mjs … 実際の画面を撮影してストア掲載用画像を生成（Playwright 使用）
 ```
 
-別途 `sharepoint-office-launcher-1.1.0-store.zip`（`manifest.json` がルートにある zip）を
+別途 `sharepoint-office-launcher-1.2.0-store.zip`（`manifest.json` がルートにある zip）を
 Chrome Web Store / Edge Add-ons へのアップロード用に用意しています（`npm run package` で再生成可能）。
 
 > 本書の `contoso` は Microsoft のドキュメントで使われる架空のテナント名です。実際の自社テナント名に読み替えてください。
@@ -107,10 +128,11 @@ Chrome Web Store / Edge Add-ons へのアップロード用に用意していま
 | 権限 | 用途 |
 |---|---|
 | `webNavigation` | トップレベル遷移の URL を検知 |
-| `webRequest` + `https://*.sharepoint.com/*` | リダイレクタ経由（302）で SharePoint に到達したケースの検知。**観測のみ**（ブロッキングなし） |
+| `webRequest` + `https://*.sharepoint.com/*` | リダイレクタ経由（302）で SharePoint に到達したケースの検知。**観測のみ**（ブロッキングなし）。ホスト権限は、Doc.aspx 形式のリンクのファイルの場所を同じテナントの SharePoint API に問い合わせる際にも使います |
 | `storage` | 設定・「ブラウザで開く」用の一時バイパス情報 |
 
-`tabs` 権限、`<all_urls>`、コンテンツスクリプト、`web_accessible_resources` は使用しません。外部への通信も一切行いません。
+`tabs` 権限、`<all_urls>`、コンテンツスクリプト、`web_accessible_resources` は使用しません。
+通信するのは、Doc.aspx 形式のリンクについて、リンク先と同じ許可済み SharePoint テナントにファイルの場所を問い合わせるときだけです。それ以外の外部への通信は一切行いません。
 
 ---
 
@@ -162,7 +184,7 @@ Chrome Web Store / Edge Add-ons へのアップロード用に用意していま
 
 本拡張は特定テナントを埋め込んでいないため、そのまま一般公開できます。インストールしたユーザーは初回に開く設定画面で自分のテナントを登録します。
 
-- `sharepoint-office-launcher-1.1.0-store.zip` をそれぞれのストアに提出し、公開範囲を「公開（Public）」にします。
+- `sharepoint-office-launcher-1.2.0-store.zip` をそれぞれのストアに提出し、公開範囲を「公開（Public）」にします。
 - 審査用の「権限の用途」: `webNavigation` / `webRequest` + `https://*.sharepoint.com/*` = ユーザーが許可した SharePoint テナントの Office ファイルリンクを検出するため（観測のみ）、`storage` = 設定保存。
 - プライバシー: 収集・送信するデータはありません（設定は `chrome.storage.sync` にのみ保存）。ストアのデータ使用申告では「収集しない」を選べます。
 - 掲載用画像は `store-assets/` にあります。
@@ -188,7 +210,7 @@ Chrome Web Store / Edge Add-ons へのアップロード用に用意していま
 
 #### A. Chrome Web Store（推奨）
 
-1. `sharepoint-office-launcher-1.1.0-store.zip` を Chrome Web Store デベロッパーダッシュボードにアップロード
+1. `sharepoint-office-launcher-1.2.0-store.zip` を Chrome Web Store デベロッパーダッシュボードにアップロード
 2. 公開設定を「非公開（Private: 自組織の Google Workspace ドメインのみ）」または「限定公開（Unlisted）」にする
 3. 発行された **拡張 ID**（32 文字）を控える
 4. ポリシーで強制インストール
@@ -225,7 +247,7 @@ GPO の場合は Chrome の ADMX テンプレートを導入し、
 <?xml version='1.0' encoding='UTF-8'?>
 <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
   <app appid='<拡張ID>'>
-    <updatecheck codebase='https://intra.example.com/ext/sp-office-launcher-1.1.0.crx' version='1.1.0' />
+    <updatecheck codebase='https://intra.example.com/ext/sp-office-launcher-1.2.0.crx' version='1.2.0' />
   </app>
 </gupdate>
 ```
@@ -391,7 +413,9 @@ HKLM\SOFTWARE\Policies\Microsoft\Edge\AutoLaunchProtocolsFromOrigins   (Edge)
 - **クエリ・フラグメント破棄**: 共有トークン等を Office URI に渡さない。
 - **二重検証**: Service Worker で判定後、launch.html 側でも設定を読み直して再検証（launch.html の `src` パラメータを信用しない）。
 - **最小権限**: `tabs` / `<all_urls>` / コンテンツスクリプト不使用。`webRequest` は非ブロッキングの観測のみ。`launch.html` は `web_accessible_resources` に含めないため Web ページから呼び出せません。
-- **外部通信なし**: 拡張機能自身はどこにも通信しません。認証は Office アプリ側（Microsoft 365 のサインイン）で行われます。
+- **通信は許可テナントへの問い合わせのみ**: Doc.aspx 形式のファイルの場所を取得するときだけ、リンクと同じ許可済みテナントの SharePoint API（`GetFileById`、GET、読み取りのみ）に問い合わせます。それ以外にはどこにも通信しません。
+- **API 応答の検証**: 応答の `ServerRelativeUrl` は、絶対パスであること、リンクのサイト配下であること、ドット・空セグメントがないことを確認します。そのうえで `/:x:/r/` 形式と同じ検証を通します。未サインイン時のログイン画面へのリダイレクトは追いません。
+- **ファイル ID の検証**: `sourcedoc` は GUID 形式のみ受け付けます（API の URL に任意の文字列が入らないようにするため）。
 - **CSP**: 拡張機能ページは `script-src 'self'` のみ。
 
 ---
@@ -417,6 +441,7 @@ Office が未インストール・プロトコル未登録の場合、ブラウ�
 - **ユーザー操作なしの連続起動**: Chromium は、ユーザー操作を伴わない外部プロトコル起動が短時間に連続するとブロックすることがあります。その場合は launch.html のボタンを押してください。
 - **既定ブラウザ**: Slack デスクトップアプリは OS の既定ブラウザでリンクを開きます。既定ブラウザが拡張機能を入れた Chrome / Edge であること、かつリンクが開くプロファイルに拡張機能が入っていることが必要です（複数プロファイル利用時は「最後に使ったプロファイル」で開かれます）。
 - **シークレット / InPrivate**: 既定では動作しません（拡張機能の「シークレットモードでの実行を許可」をオンにすれば動作）。
+- **Doc.aspx 形式はブラウザでのサインインが必要**: ファイルの場所を SharePoint API に問い合わせるため、ブラウザで対象テナントにサインインしている必要があります。サードパーティ Cookie をブロックする設定やシークレットモードでは問い合わせが失敗する場合があります（その場合は「ブラウザで開く」で開けます）。
 - **共有リンク非対応**: `/:p:/g/`・`/:p:/s/`（「リンクを知っているユーザー」等の共有リンク）は実パスを含まないため変換できず、ブラウザで開きます。
 - **Office アカウント**: Office デスクトップアプリが対象テナントのアカウントでサインインしている必要があります。未サインインならアプリ側でサインインを求められます。
 - **Edge の Office 連携**: Edge には Office ファイルを Edge 内で開く機能や SharePoint の「デスクトップアプリで開く」連携があります。本拡張は `/:p:/r/` の遷移を先に差し替えるため通常は干渉しませんが、組織ポリシーでの動作は実機で確認してください。
@@ -471,6 +496,9 @@ Start-Process "https://contoso.sharepoint.com/:p:/r/sites/Test/Shared%20Document
 | T9 | 設定「有効にする」をオフ | 介入しない |
 | T10 | ポリシーで allowedHosts を配布 | 設定画面の該当項目がグレーアウトされ、配布値で動作 |
 | T11 | Chrome と Edge の両方で T1〜T8 | 同様に動作 |
+| T12 | `/:p:/r/…/_layouts/15/Doc.aspx?sourcedoc=…` 形式のリンク（ブラウザでサインイン済み） | 「ファイルを確認しています…」の後、PowerPoint が起動して該当ファイルを開く |
+| T13 | T12 をシークレット / InPrivate（未サインイン）で開く | 「サインインしていない」と表示され、「ブラウザで開く」で開ける |
+| T14 | T12 でアクセス権のないファイル | 「アクセス権がない」と表示される |
 
 ### ログの確認
 
@@ -503,7 +531,7 @@ Node.js 20 以上で、URL 変換・検証、ループ防止ロジック、manif
 npm test
 ```
 
-ブラウザ実機での E2E（Playwright の Chromium に拡張機能を読み込み、横取り・素通り・「ブラウザで開く」・戻る対策・SW 再起動後の動作を確認。`*.sharepoint.com` は名前解決させないため実テナントには通信しません）:
+ブラウザ実機での E2E（Playwright の Chromium に拡張機能を読み込み、横取り・素通り・Doc.aspx 形式の解決〔Cookie 付きの API 問い合わせ・未サインイン・403〕・「ブラウザで開く」・戻る対策・SW 再起動後の動作を確認。`contoso.sharepoint.com` はローカルの偽 SharePoint〔自己署名証明書の HTTPS。生成に openssl を使用〕に向け、他の `*.sharepoint.com` は名前解決させないため、実テナントには通信しません）:
 
 ```bash
 npm i -D playwright
@@ -540,6 +568,11 @@ npm run package
 ---
 
 ## 14. 変更履歴・更新時の注意
+
+### 1.2.0
+
+- `/:p|x|w:/r/…/_layouts/15/Doc.aspx?sourcedoc={ID}&file=…` 形式のリンクに対応しました。ファイル ID から実ファイルの場所を、同じテナントの SharePoint API で取得します。
+- これに伴い、プライバシーポリシーとストアの権限説明を更新しました（許可テナントの SharePoint にのみ問い合わせる）。
 
 ### 1.1.0
 
