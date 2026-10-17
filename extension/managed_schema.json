@@ -2,26 +2,31 @@
   "type": "object",
   "properties": {
     "enabled": {
-      "title": "拡張機能を有効にする",
+      "title": "Enable the extension",
       "type": "boolean"
     },
     "allowedHosts": {
-      "title": "許可する SharePoint ホスト",
-      "description": "例: [\"contoso.sharepoint.com\", \"contoso-my.sharepoint.com\"]。テナント名のみ（contoso）も可。",
+      "title": "Allowed SharePoint hosts",
+      "description": "e.g. [\"contoso.sharepoint.com\", \"contoso-my.sharepoint.com\"]. A bare tenant name (contoso) is also accepted.",
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "openMode": {
-      "title": "開き方（ofe=編集, ofv=閲覧）",
+      "title": "Open mode (ofe = edit, ofv = read-only)",
       "type": "string",
-      "enum": ["ofe", "ofv"]
+      "enum": [
+        "ofe",
+        "ofv"
+      ]
     },
     "autoLaunch": {
-      "title": "自動起動する",
+      "title": "Launch the app automatically",
       "type": "boolean"
     },
     "closeTabAfterLaunch": {
-      "title": "起動後にタブを閉じる",
+      "title": "Close the tab after launching",
       "type": "boolean"
     }
   }

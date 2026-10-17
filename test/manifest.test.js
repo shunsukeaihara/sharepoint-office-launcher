@@ -16,6 +16,8 @@ test('manifest は MV3 で、参照ファイルがすべて存在する', () => 
     ...Object.values(manifest.icons),
     'launch.html',
     'launch.js',
+    '_locales/en/messages.json',
+    '_locales/ja/messages.json',
   ];
   for (const f of files) assert.ok(existsSync(join(root, f)), `missing: ${f}`);
   JSON.parse(readFileSync(join(root, manifest.storage.managed_schema), 'utf8'));

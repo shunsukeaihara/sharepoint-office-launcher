@@ -1,28 +1,32 @@
 import { linkFromServerRelativeUrl, parseDocAspxLink, parseSharePointLink, toOfficeUri } from './lib/convert.js';
 import { getConfig } from './lib/config.js';
 import { addBypass, navKey } from './lib/guard.js';
+import { localizePage, t } from './lib/i18n.js';
 import { resolveServerRelativeUrl } from './lib/resolve.js';
 
 const BYPASS_KEY = 'bypass';
 const CLOSE_DELAY_MS = 4000;
 const $ = (id) => document.getElementById(id);
 
+// 失敗理由コード → メッセージキー（_locales/*/messages.json）
 const REASONS = {
-  'host-not-allowed': '許可されていないテナントのリンクです。',
-  'not-r-link': '対応していない形式のリンクです。',
-  'not-doc-aspx': '対応していない形式のリンクです。',
-  'extension-mismatch': 'リンク種別とファイル拡張子が一致しません。',
-  'outside-site': 'ファイルの場所がリンク先のサイト外を指しているため開けません。',
-  'not-signed-in': 'SharePoint にサインインしていないため、ファイルの場所を確認できませんでした。ブラウザで開いてサインインしてから、もう一度リンクを開いてください。',
-  forbidden: 'このファイルへのアクセス権がないため、ファイルの場所を確認できませんでした。',
-  'not-found': 'ファイルが見つかりませんでした（移動または削除された可能性があります）。',
-  timeout: 'SharePoint からの応答がタイムアウトしました。',
-  network: 'SharePoint に接続できませんでした。',
-  'http-error': 'SharePoint からエラーが返されました。',
-  'bad-response': 'SharePoint から想定外の応答が返されました。',
+  'host-not-allowed': 'errHostNotAllowed',
+  'not-r-link': 'errUnsupportedLink',
+  'not-doc-aspx': 'errUnsupportedLink',
+  'extension-mismatch': 'errExtensionMismatch',
+  'outside-site': 'errOutsideSite',
+  'not-signed-in': 'errNotSignedIn',
+  forbidden: 'errForbidden',
+  'not-found': 'errNotFound',
+  timeout: 'errTimeout',
+  network: 'errNetwork',
+  'http-error': 'errHttp',
+  'bad-response': 'errBadResponse',
 };
+const reasonText = (reason, fallbackKey) => (REASONS[reason] ? t(REASONS[reason]) : t(fallbackKey, [reason]));
 
-main().catch((e) => showError(`起動に失敗しました: ${e?.message || e}`));
+localizePage();
+main().catch((e) => showError(t('errStartup', [String(e?.message || e)])));
 
 async function main() {
   const src = new URLSearchParams(location.search).get('src') || '';
@@ -36,16 +40,16 @@ async function main() {
     const doc = parseDocAspxLink(src, config.allowedHosts);
     if (!doc.ok) {
       $('details').hidden = false;
-      showError(REASONS[r.reason] || `このリンクは処理できません（${r.reason}）。`);
+      showError(reasonText(r.reason, 'errUnknownLink'));
       return;
     }
     // Doc.aspx 形式: ファイル ID から実ファイルの場所を SharePoint に問い合わせる。
-    $('title').textContent = `${doc.app} のファイルを確認しています…`;
+    $('title').textContent = t('launchResolving', [doc.app]);
     if (doc.fileName) {
       $('file').textContent = doc.fileName;
       $('file').hidden = false;
     }
-    $('message').textContent = 'SharePoint にファイルの場所を問い合わせています。';
+    $('message').textContent = t('launchResolvingHint');
     try {
       const sru = await resolveServerRelativeUrl(doc);
       r = linkFromServerRelativeUrl(doc, sru, config.openMode);
@@ -54,7 +58,7 @@ async function main() {
     }
     if (!r.ok) {
       $('details').hidden = false;
-      showError(REASONS[r.reason] || `ファイルの場所を確認できませんでした（${r.reason}）。`, { src });
+      showError(reasonText(r.reason, 'errUnknownResolve'), { src });
       return;
     }
   }
@@ -62,13 +66,13 @@ async function main() {
   const editUri = toOfficeUri(r.scheme, 'ofe', r.fileUrl);
   const viewUri = toOfficeUri(r.scheme, 'ofv', r.fileUrl);
 
-  document.title = `${r.app} で開いています`;
-  $('title').textContent = `${r.app} で開いています…`;
-  $('message').textContent = 'ブラウザに「アプリを開きますか？」と表示された場合は「開く」を選んでください。';
+  document.title = t('launchDocTitle', [r.app]);
+  $('title').textContent = t('launchOpening', [r.app]);
+  $('message').textContent = t('launchDialogHint');
   $('file').textContent = r.fileName;
   $('file').hidden = false;
   $('file-url').textContent = r.fileUrl;
-  $('open-edit').textContent = `${r.app} で開く（編集）`;
+  $('open-edit').textContent = t('btnOpenEdit', [r.app]);
   $('actions').hidden = false;
   $('details').hidden = false;
 
@@ -77,14 +81,14 @@ async function main() {
   bindOpenInBrowser(src);
   $('copy').addEventListener('click', async () => {
     await navigator.clipboard.writeText(r.fileUrl);
-    $('copy').textContent = 'コピーしました';
+    $('copy').textContent = t('copied');
   });
 
   // 戻るボタン等でこのページに戻った場合は自動起動しない（再起動ループ防止）。
   const alreadyLaunched = history.state && history.state.launched === true;
   if (!config.autoLaunch || alreadyLaunched) {
-    $('title').textContent = `${r.app} で開く`;
-    $('message').textContent = '下のボタンから開き方を選んでください。';
+    $('title').textContent = t('launchChoose', [r.app]);
+    $('message').textContent = t('launchChooseHint');
     return;
   }
 
@@ -120,7 +124,7 @@ async function openInBrowser(src) {
 
 /** @param {{src?: string}} [opts] src を渡すと、許可済みリンクとして「ブラウザで開く」を表示する */
 function showError(text, { src } = {}) {
-  $('title').textContent = 'Office アプリで開けませんでした';
+  $('title').textContent = t('errorTitle');
   $('message').hidden = true;
   $('error').textContent = text;
   $('error').hidden = false;

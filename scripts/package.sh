@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 VER=$(node -p "JSON.parse(require('fs').readFileSync('extension/manifest.json','utf8')).version")
 NAME=sharepoint-office-launcher-$VER
 rm -rf dist && mkdir -p dist/stage/$NAME
-cp -R README.md LICENSE PRIVACY.md package.json assets store-assets extension test scripts dist/stage/$NAME/
+cp -R README.md README_jp.md LICENSE PRIVACY.md package.json assets store-assets store-listing extension test scripts dist/stage/$NAME/
 (cd dist/stage && zip -qrX ../$NAME.zip $NAME -x '*.DS_Store')
 (cd extension && zip -qrX ../dist/$NAME-store.zip . -x '*.DS_Store')
 rm -rf dist/stage

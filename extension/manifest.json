@@ -1,12 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "SharePoint Office Launcher",
-  "short_name": "SP Office Launcher",
-  "version": "1.2.0",
-  "description": "許可した SharePoint テナントの PowerPoint / Excel / Word リンクを Office デスクトップアプリで直接開きます。",
+  "name": "__MSG_extName__",
+  "short_name": "__MSG_extShortName__",
+  "version": "1.3.0",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
   "minimum_chrome_version": "110",
-  "permissions": ["webNavigation", "webRequest", "storage"],
-  "host_permissions": ["https://*.sharepoint.com/*"],
+  "permissions": [
+    "webNavigation",
+    "webRequest",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.sharepoint.com/*"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"

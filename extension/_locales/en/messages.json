@@ -1,0 +1,211 @@
+{
+  "extName": {
+    "message": "SharePoint Office Launcher"
+  },
+  "extShortName": {
+    "message": "SPO Launcher"
+  },
+  "extDescription": {
+    "message": "Open PowerPoint, Excel, and Word links from your allowed SharePoint tenants directly in the Office desktop apps."
+  },
+  "launchPageTitle": {
+    "message": "Opening in Office app"
+  },
+  "launchOpeningGeneric": {
+    "message": "Opening in Office app…"
+  },
+  "launchOpening": {
+    "message": "Opening in $app$…",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "launchDocTitle": {
+    "message": "Opening in $app$",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "launchDialogHint": {
+    "message": "If your browser asks whether to open the app, choose “Open”."
+  },
+  "launchResolving": {
+    "message": "Checking the $app$ file…",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "launchResolvingHint": {
+    "message": "Asking SharePoint for the file location."
+  },
+  "launchChoose": {
+    "message": "Open in $app$",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "launchChooseHint": {
+    "message": "Choose how to open the file below."
+  },
+  "btnOpenDesktop": {
+    "message": "Open in desktop app"
+  },
+  "btnOpenEdit": {
+    "message": "Open in $app$ (edit)",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "btnOpenView": {
+    "message": "Open read-only"
+  },
+  "btnOpenBrowser": {
+    "message": "Open in browser"
+  },
+  "btnCopy": {
+    "message": "Copy file URL"
+  },
+  "copied": {
+    "message": "Copied"
+  },
+  "details": {
+    "message": "Details"
+  },
+  "detailsSource": {
+    "message": "Original link"
+  },
+  "detailsFileUrl": {
+    "message": "File URL"
+  },
+  "errorTitle": {
+    "message": "Couldn't open in the Office app"
+  },
+  "errStartup": {
+    "message": "Failed to start: $detail$",
+    "placeholders": {
+      "detail": {
+        "content": "$1"
+      }
+    }
+  },
+  "errUnknownLink": {
+    "message": "This link can't be handled ($reason$).",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "errUnknownResolve": {
+    "message": "Couldn't find the file location ($reason$).",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "errHostNotAllowed": {
+    "message": "This link belongs to a tenant that is not allowed."
+  },
+  "errUnsupportedLink": {
+    "message": "This link format is not supported."
+  },
+  "errExtensionMismatch": {
+    "message": "The link type does not match the file extension."
+  },
+  "errOutsideSite": {
+    "message": "The file location points outside the linked site, so it can't be opened."
+  },
+  "errNotSignedIn": {
+    "message": "You are not signed in to SharePoint, so the file location couldn't be checked. Open the link in the browser, sign in, and then open the link again."
+  },
+  "errForbidden": {
+    "message": "You don't have access to this file, so its location couldn't be checked."
+  },
+  "errNotFound": {
+    "message": "The file was not found (it may have been moved or deleted)."
+  },
+  "errTimeout": {
+    "message": "SharePoint did not respond in time."
+  },
+  "errNetwork": {
+    "message": "Couldn't connect to SharePoint."
+  },
+  "errHttp": {
+    "message": "SharePoint returned an error."
+  },
+  "errBadResponse": {
+    "message": "SharePoint returned an unexpected response."
+  },
+  "optPageTitle": {
+    "message": "SharePoint Office Launcher Settings"
+  },
+  "optManaged": {
+    "message": "Some settings are managed by your organization and can't be changed."
+  },
+  "optEnabled": {
+    "message": "Enabled"
+  },
+  "optHostsHeading": {
+    "message": "Allowed tenants (one per line)"
+  },
+  "optHostsNote1": {
+    "message": "Entering just a tenant name such as “contoso” is treated as "
+  },
+  "optHostsNote2": {
+    "message": ". To include OneDrive (personal sites), add "
+  },
+  "optHostsNote3": {
+    "message": " on a separate line. Links to hosts not listed here are never touched."
+  },
+  "optOpenModeHeading": {
+    "message": "Open mode"
+  },
+  "optModeEdit": {
+    "message": "Open for editing (ofe)"
+  },
+  "optModeView": {
+    "message": "Open read-only (ofv)"
+  },
+  "optAutoLaunch": {
+    "message": "Launch the app automatically (when off, choose with a button)"
+  },
+  "optCloseTab": {
+    "message": "Close the tab 4 seconds after launching"
+  },
+  "optCloseTabNote": {
+    "message": "Closing the tab is intended for environments where the AutoLaunchProtocolsFromOrigins policy suppresses the confirmation dialog. If the dialog is shown, it may close before you can choose."
+  },
+  "optSave": {
+    "message": "Save"
+  },
+  "optSaved": {
+    "message": "Saved."
+  },
+  "optInvalidHosts": {
+    "message": "Invalid host names: $hosts$ (only *.sharepoint.com is allowed)",
+    "placeholders": {
+      "hosts": {
+        "content": "$1"
+      }
+    }
+  },
+  "optExtIdHeading": {
+    "message": "Extension ID (for policy configuration)"
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "extName": {
+    "message": "SharePoint Office Launcher"
+  },
+  "extShortName": {
+    "message": "SPO Launcher"
+  },
+  "extDescription": {
+    "message": "許可した SharePoint テナントの PowerPoint / Excel / Word リンクを Office デスクトップアプリで直接開きます。"
+  },
+  "launchPageTitle": {
+    "message": "Office アプリで開いています"
+  },
+  "launchOpeningGeneric": {
+    "message": "Office アプリで開いています…"
+  },
+  "launchOpening": {
+    "message": "$app$ で開いています…",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "launchDocTitle": {
+    "message": "$app$ で開いています",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "launchDialogHint": {
+    "message": "ブラウザに「アプリを開きますか？」と表示された場合は「開く」を選んでください。"
+  },
+  "launchResolving": {
+    "message": "$app$ のファイルを確認しています…",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "launchResolvingHint": {
+    "message": "SharePoint にファイルの場所を問い合わせています。"
+  },
+  "launchChoose": {
+    "message": "$app$ で開く",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "launchChooseHint": {
+    "message": "下のボタンから開き方を選んでください。"
+  },
+  "btnOpenDesktop": {
+    "message": "デスクトップアプリで開く"
+  },
+  "btnOpenEdit": {
+    "message": "$app$ で開く（編集）",
+    "placeholders": {
+      "app": {
+        "content": "$1",
+        "example": "PowerPoint"
+      }
+    }
+  },
+  "btnOpenView": {
+    "message": "読み取り専用で開く"
+  },
+  "btnOpenBrowser": {
+    "message": "ブラウザで開く"
+  },
+  "btnCopy": {
+    "message": "ファイル URL をコピー"
+  },
+  "copied": {
+    "message": "コピーしました"
+  },
+  "details": {
+    "message": "詳細"
+  },
+  "detailsSource": {
+    "message": "元のリンク"
+  },
+  "detailsFileUrl": {
+    "message": "ファイル URL"
+  },
+  "errorTitle": {
+    "message": "Office アプリで開けませんでした"
+  },
+  "errStartup": {
+    "message": "起動に失敗しました: $detail$",
+    "placeholders": {
+      "detail": {
+        "content": "$1"
+      }
+    }
+  },
+  "errUnknownLink": {
+    "message": "このリンクは処理できません（$reason$）。",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "errUnknownResolve": {
+    "message": "ファイルの場所を確認できませんでした（$reason$）。",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "errHostNotAllowed": {
+    "message": "許可されていないテナントのリンクです。"
+  },
+  "errUnsupportedLink": {
+    "message": "対応していない形式のリンクです。"
+  },
+  "errExtensionMismatch": {
+    "message": "リンク種別とファイル拡張子が一致しません。"
+  },
+  "errOutsideSite": {
+    "message": "ファイルの場所がリンク先のサイト外を指しているため開けません。"
+  },
+  "errNotSignedIn": {
+    "message": "SharePoint にサインインしていないため、ファイルの場所を確認できませんでした。ブラウザで開いてサインインしてから、もう一度リンクを開いてください。"
+  },
+  "errForbidden": {
+    "message": "このファイルへのアクセス権がないため、ファイルの場所を確認できませんでした。"
+  },
+  "errNotFound": {
+    "message": "ファイルが見つかりませんでした（移動または削除された可能性があります）。"
+  },
+  "errTimeout": {
+    "message": "SharePoint からの応答がタイムアウトしました。"
+  },
+  "errNetwork": {
+    "message": "SharePoint に接続できませんでした。"
+  },
+  "errHttp": {
+    "message": "SharePoint からエラーが返されました。"
+  },
+  "errBadResponse": {
+    "message": "SharePoint から想定外の応答が返されました。"
+  },
+  "optPageTitle": {
+    "message": "SharePoint Office Launcher 設定"
+  },
+  "optManaged": {
+    "message": "一部の項目は組織のポリシーで管理されているため変更できません。"
+  },
+  "optEnabled": {
+    "message": "有効にする"
+  },
+  "optHostsHeading": {
+    "message": "許可するテナント（1 行に 1 つ）"
+  },
+  "optHostsNote1": {
+    "message": "「contoso」のようなテナント名だけを書くと "
+  },
+  "optHostsNote2": {
+    "message": " と解釈します。OneDrive（個人用サイト）も対象にする場合は "
+  },
+  "optHostsNote3": {
+    "message": " を別行で追加してください。ここにないホストのリンクには一切介入しません。"
+  },
+  "optOpenModeHeading": {
+    "message": "開き方"
+  },
+  "optModeEdit": {
+    "message": "編集モードで開く（ofe）"
+  },
+  "optModeView": {
+    "message": "読み取り専用で開く（ofv）"
+  },
+  "optAutoLaunch": {
+    "message": "自動でアプリを起動する（オフにするとボタンで選択）"
+  },
+  "optCloseTab": {
+    "message": "起動後 4 秒でタブを閉じる"
+  },
+  "optCloseTabNote": {
+    "message": "タブを閉じる設定は、AutoLaunchProtocolsFromOrigins ポリシーで確認ダイアログを出さない環境向けです。ダイアログが出る環境で有効にすると、選択前にダイアログが閉じることがあります。"
+  },
+  "optSave": {
+    "message": "保存"
+  },
+  "optSaved": {
+    "message": "保存しました。"
+  },
+  "optInvalidHosts": {
+    "message": "不正なホスト名: $hosts$（*.sharepoint.com のみ指定できます）",
+    "placeholders": {
+      "hosts": {
+        "content": "$1"
+      }
+    }
+  },
+  "optExtIdHeading": {
+    "message": "拡張機能 ID（ポリシー設定用）"
+  }
+}

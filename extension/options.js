@@ -1,5 +1,6 @@
 import { normalizeHost } from './lib/convert.js';
 import { getConfig } from './lib/config.js';
+import { localizePage, t } from './lib/i18n.js';
 
 const $ = (id) => document.getElementById(id);
 const FIELDS = ['enabled', 'allowedHosts', 'openMode', 'autoLaunch', 'closeTabAfterLaunch'];
@@ -22,7 +23,7 @@ async function save() {
   const lines = $('allowedHosts').value.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
   const invalid = lines.filter((s) => !normalizeHost(s));
   if (invalid.length) {
-    $('status').textContent = `不正なホスト名: ${invalid.join(', ')}（*.sharepoint.com のみ指定できます）`;
+    $('status').textContent = t('optInvalidHosts', [invalid.join(', ')]);
     return;
   }
   await chrome.storage.sync.set({
@@ -32,9 +33,10 @@ async function save() {
     autoLaunch: $('autoLaunch').checked,
     closeTabAfterLaunch: $('closeTabAfterLaunch').checked,
   });
-  $('status').textContent = '保存しました。';
+  $('status').textContent = t('optSaved');
   await load();
 }
 
+localizePage();
 $('save').addEventListener('click', () => save().catch((e) => { $('status').textContent = String(e); }));
 load();
